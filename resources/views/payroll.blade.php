@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kalkulator Gaji dan PPh 21</title>
+    <title>{{ isset($result) ? 'Perhitungan gaji dan PPh 21 ' . $input['ptkp_status'] : 'Kalkulator Gaji dan PPh 21' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -124,7 +124,17 @@
             border-radius: var(--radius);
             box-shadow: 0 1px 2px #16283A14, 0 12px 32px -12px #16283A33;
         }
-        .slip-head { padding: 24px 28px 20px; border-bottom: 1.5px dashed var(--rule); }
+        .slip-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 24px 28px 20px; border-bottom: 1.5px dashed var(--rule); }
+        .print {
+            flex: none;
+            font-size: .85rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: transparent;
+            border: 1px solid var(--rule);
+            padding: 7px 12px;
+        }
+        .print:hover { background: #1D4E890F; }
         .slip-head p { margin: 4px 0 0; color: var(--muted); font-size: .9rem; }
 
         .slip-body { display: grid; grid-template-columns: 1fr 1fr; }
@@ -192,6 +202,23 @@
             .slip-head, .slip-body section, .slip-total { padding-left: 20px; padding-right: 20px; }
             .slip-foot { padding: 0 20px 20px; }
         }
+
+        /* Print / Save as PDF: an A4 document with the results only, no form. */
+        @page { size: A4; margin: 14mm; }
+        @media print {
+            :root { --paper: #FFFFFF; }
+            body { font-size: 10pt; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .page { max-width: none; padding: 0; }
+            .intro { margin-bottom: 16px; }
+            .workspace { display: block; }
+            .workspace > form, .print { display: none; }
+            .slip { box-shadow: none; border: 1px solid var(--rule); }
+            .slip-total strong { font-size: 22pt; }
+            .slip, table, .pair section { break-inside: avoid; }
+            .detail { margin-top: 24px; gap: 24px; }
+            .pair { grid-template-columns: 1fr 1fr; gap: 28px; }
+            footer { margin-top: 24px; }
+        }
     </style>
 </head>
 <body>
@@ -252,8 +279,17 @@
             @php($emp = $jan['bpjs_employee'])
             <article class="slip" aria-labelledby="slip-title">
                 <div class="slip-head">
-                    <h2 id="slip-title">Slip gaji bulanan</h2>
-                    <p>Januari sampai November, status {{ $input['ptkp_status'] }}, TER kategori {{ $jan['ter_category'] }}</p>
+                    <div>
+                        <h2 id="slip-title">Slip gaji bulanan</h2>
+                        <p>Januari sampai November, status {{ $input['ptkp_status'] }}, TER kategori {{ $jan['ter_category'] }}</p>
+                        @if (($input['tk_base_salary_only'] ?? false) || ($input['no_jp'] ?? false))
+                            <p>Kebijakan perusahaan: {{ implode(', ', array_filter([
+                                ($input['tk_base_salary_only'] ?? false) ? 'BPJS Ketenagakerjaan dari gaji pokok' : null,
+                                ($input['no_jp'] ?? false) ? 'tidak ikut JP' : null,
+                            ])) }}</p>
+                        @endif
+                    </div>
+                    <button type="button" class="print" onclick="window.print()">Simpan PDF</button>
                 </div>
                 <div class="slip-body">
                     <section>

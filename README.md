@@ -10,7 +10,7 @@ A small Laravel app that calculates monthly payroll for a permanent employee in 
   - JHT, JP, JKK and JKM calculated on gaji pokok only
   - Employee not enrolled in JP
 
-The result is shown as a monthly payslip, a 12-month table, the gross income breakdown, and the December PPh 21 calculation. The form uses GET, so every scenario has a shareable URL.
+The result is shown as a monthly payslip, a 12-month table, the gross income breakdown, and the December PPh 21 calculation. The form uses GET, so every scenario has a shareable URL. The "Simpan PDF" button prints the result as an A4 document through the browser's Save as PDF.
 
 ## What it calculates
 

@@ -57,6 +57,15 @@ class PayrollFormTest extends TestCase
         $this->post('/', ['salary' => 10_000_000, 'ptkp_status' => 'TK/0'])->assertMethodNotAllowed();
     }
 
+    public function test_pdf_button_only_with_result(): void
+    {
+        $this->get('/')->assertDontSee('Simpan PDF');
+        $this->get('/?'.http_build_query(['salary' => '8.000.000', 'ptkp_status' => 'K/1', 'no_jp' => '1']))
+            ->assertSee('Simpan PDF')
+            ->assertSee('<title>Perhitungan gaji dan PPh 21 K/1</title>', false)
+            ->assertSee('Kebijakan perusahaan: tidak ikut JP');
+    }
+
     public function test_invalid_input_is_rejected(): void
     {
         $this->get('/?'.http_build_query(['salary' => -1, 'ptkp_status' => 'X/9']))
